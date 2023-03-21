@@ -59,14 +59,14 @@ npm run local-mainnet <PINGER BOT NAME>
 The following commands will deploy all the lambda functions from `serverless.yml` on AWS:
 
 ```
-npm run deploy-kovan
+npm run deploy-goerli
 npm run deploy-mainnet
 ```
 
 To remove the deployment and cleanup all AWS resources, do:
 
 ```
-serverless remove --stage kovan
+serverless remove --stage goerli
 serverless remove --stage mainnet
 ```
 ## RAI subsidy
@@ -87,7 +87,7 @@ Bot environment variables can be configured from the serverless dashboard:
 - Mainnet: https://app.serverless.com/<ORG_NAME>/apps/geb-pinger-bots/geb-pinger-bots/settings/stages/mainnet
 - Kovan: https://app.serverless.com/<ORG_NAME>/apps/geb-pinger-bots/geb-pinger-bots/settings/stages/kovan
 
-After changing a variable, the bots also need to be redeployed. To do that, open the serverless dashboard and go to App -> Kovan/Mainnet -> Deploys and click on "Redeploy".
+After changing a variable, the bots also need to be redeployed. To do that, open the serverless dashboard and go to App -> Goerli/Mainnet -> Deploys and click on "Redeploy".
 
 All environment variables are exclusively read from the `src/index.ts` file.
 

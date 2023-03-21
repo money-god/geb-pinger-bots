@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { BigNumber, ethers } from 'ethers'
-import { utils, Geb, BaseContractAPI, GebContractAPIConstructorInterface } from 'geb.js'
+import { utils, Geb, BaseContractAPI, GebContractAPIConstructorInterface } from 'mcgeb.js'
 import { notifier } from '..'
 import {
   ETH_NODE_STALL_SYNC_TIMEOUT,

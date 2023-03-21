@@ -12,7 +12,7 @@ import { StabilityFeeTreasuryPinger } from './pingers/stability-fee-treasury'
 import { TaxCollectorPinger } from './pingers/tax-collector'
 import { getAddress, getProvider, getWallet } from './utils/wallet'
 import { PingerConifg } from './utils/types'
-import kovanConfig from './../config/config.kovan.json'
+import goerliConfig from './../config/config.goerli.json'
 import mainnetConfig from './../config/config.mainnet.json'
 import { DebtFloorAdjuster } from './pingers/debt-floor-adjuster'
 import { AutoSurplusAuctionedSetter } from './pingers/auto-surplus-auctioned-setter'
@@ -32,7 +32,7 @@ type EnvVar =
 
 const env = process.env as { [key in EnvVar]: string }
 
-const config = (env.NETWORK === 'mainnet' ? mainnetConfig : kovanConfig) as PingerConifg
+const config = (env.NETWORK === 'mainnet' ? mainnetConfig : goerliConfig) as PingerConifg
 
 export const notifier = new Notifier(env.SLACK_HOOK_ERROR_URL, env.SLACK_HOOK_MULTISIG_URL)
 
@@ -56,7 +56,7 @@ export const updateCoinTwapAndRateSetter = async () => {
 }
 
 // ETH OSM
-export const updateETHFsm = async () => {
+export const updateFsms = async () => {
   const wallet = await getWallet(
     env.ETH_RPC,
     env.ACCOUNTS_PASSPHRASE,
@@ -64,14 +64,17 @@ export const updateETHFsm = async () => {
     env.NETWORK
   )
   const pinger = new CollateralFsmPinger(
-    config.pingers.ethFsm.fsmAddress,
-    config.pingers.ethFsm.oracleRelayerAddress,
+    config.pingers.collateralFsms.fsmEthAddress,
+    config.pingers.collateralFsms.fsmWstEthAddress,
+    config.pingers.collateralFsms.fsmREthAddress,
+    config.pingers.collateralFsms.fsmRaiAddress,
+    config.pingers.collateralFsms.oracleRelayerAddress,
     config.pingers.ethFsm.collateralType,
     wallet,
-    config.pingers.ethFsm.minUpdateInterval * 60,
-    config.pingers.ethFsm.maxNoUpdateInterval * 60,
-    config.pingers.ethFsm.minUpdateIntervalDeviation,
-    config.pingers.ethFsm.callBundlerAddress
+    config.pingers.collateralFsms.minUpdateInterval * 60,
+    config.pingers.collateralFsms.maxNoUpdateInterval * 60,
+    config.pingers.collateralFsms.minUpdateIntervalDeviation,
+    config.pingers.collateralFsms.callBundlerAddress
   )
   await pinger.ping()
 }

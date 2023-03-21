@@ -4,14 +4,14 @@
   "description": "This a collection of pinger bots running on AWS lambda to maintain the GEB reflex index system.",
   "main": "index.js",
   "scripts": {
-    "local-kovan": "serverless invoke local --stage kovan --function",
+    "local-goerli": "serverless invoke local --stage goerli --function",
     "local-mainnet": "serverless invoke local --stage mainnet --function",
-    "deploy-kovan": "serverless deploy --stage kovan",
+    "deploy-goerli": "serverless deploy --stage goerli",
     "deploy-mainnet": "serverless deploy --stage mainnet",
     "postinstall": "patch-package"
   },
   "dependencies": {
-    "@reflexer-finance/geb-admin": "1.1.24",
+    "@money-god/geb-admin": "1.1.1",
     "axios": "^0.20.0",
     "ethers": "^5.4.5",
     "mongoose": "^5.9.10",
@@ -42,14 +42,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reflexer-labs/geb-pinger-bots.git"
+    "url": "git+https://github.com/money-god/geb-pinger-bots.git"
   },
   "keywords": [
     "geb",
     "pinger",
     "bot",
-    "Reflexer"
+    "money-god"
   ],
-  "author": "Guillaume Felley <guillaume@reflexer.finance>",
+  "author": "peakaw <peakaw@protonmail.com>",
   "license": "ISC"
 }

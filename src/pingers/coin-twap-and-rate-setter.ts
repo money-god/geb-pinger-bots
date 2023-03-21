@@ -1,5 +1,5 @@
 import { BigNumber, Contract, ethers } from 'ethers'
-import { contracts, TransactionRequest } from 'geb.js'
+import { contracts, TransactionRequest } from 'mcgeb.js'
 import { notifier } from '..'
 import { Transactor } from '../chains/transactor'
 import { COIN_TWAP__UPDATE_RESULTS_GAS, RATE_SETTER__UPDATE_RATE_GAS } from '../utils/constants'

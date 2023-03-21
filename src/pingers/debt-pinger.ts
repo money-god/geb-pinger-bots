@@ -1,4 +1,4 @@
-import { contracts } from '@reflexer-finance/geb-admin'
+import { contracts } from '@money-god/geb-admin'
 import { BigNumber, ethers } from 'ethers'
 import { Transactor } from '../chains/transactor'
 import {

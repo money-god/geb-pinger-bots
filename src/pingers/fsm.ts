@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { contracts, TransactionRequest, utils } from 'geb.js'
+import { contracts, TransactionRequest, utils } from 'mcgeb.js'
 import { notifier } from '..'
 import { Transactor } from '../chains/transactor'
 import {
@@ -10,12 +10,18 @@ import {
 import { now } from '../utils/time'
 
 export class CollateralFsmPinger {
-  private fsm: contracts.Osm
+  private fsmEth: contracts.Osm
+  private fsmWstEth: contracts.Osm
+  private fsmREth: contracts.Osm
+  private fsmRai: contracts.Osm
   private oracleRelayer: contracts.OracleRelayer
   private transactor: Transactor
 
   constructor(
-    osmAddress: string,
+    ethOsmAddress: string,
+    wstethOsmAddress: string,
+    rethOsmAddress: string,
+    raiOsmAddress: string,
     oracleRelayerAddress: string,
     private collateralType: string,
     wallet: ethers.Signer,
@@ -25,7 +31,10 @@ export class CollateralFsmPinger {
     private callBundlerAddress?: string
   ) {
     this.transactor = new Transactor(wallet)
-    this.fsm = this.transactor.getGebContract(contracts.Osm, osmAddress)
+    this.fsmEth = this.transactor.getGebContract(contracts.Osm, ethOsmAddress)
+    this.fsmWstEth = this.transactor.getGebContract(contracts.Osm, wstethOsmAddress)
+    this.fsmREth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
+    this.fsmRai = this.transactor.getGebContract(contracts.Osm, raiOsmAddress)
     this.oracleRelayer = this.transactor.getGebContract(
       contracts.OracleRelayer,
       oracleRelayerAddress
@@ -42,10 +51,10 @@ export class CollateralFsmPinger {
         // Use the call bundler if available
         if (this.callBundlerAddress) {
           txFsm = await new ethers.Contract(this.callBundlerAddress, [
-            'function updateOsmAndEthAOracleRelayer() external',
-          ]).populateTransaction.updateOsmAndEthAOracleRelayer()
+            'function updateAllOsmsAndCollateralTypes() external',
+          ]).populateTransaction.updateAllOsmsAndCollateralTypes()
         } else {
-          txFsm = this.fsm.updateResult()
+          txFsm = this.fsmEth.updateResult()
         }
         await this.transactor.ethCall(txFsm)
       } catch (err) {
@@ -63,7 +72,7 @@ export class CollateralFsmPinger {
       }
 
       // Send FSM transaction
-      let fsmHash = await this.transactor.ethSend(txFsm, true, COLLATERAL_FSM__UPDATE_RESULTS_GAS)
+      let fsmHash = await this.transactor.ethSend(txFsm, true, COLLATERAL_FSM__UPDATE_RESULTS_GAS * 4)
       didUpdateFsm = true
       console.log(`FSM update sent, transaction hash: ${fsmHash}`)
     } else {
@@ -102,8 +111,8 @@ export class CollateralFsmPinger {
       // A transaction from a previous run is pending and therefore needs a gas bump so we should update
       return true
     }
-    const fsmLastUpdatedTime = await this.fsm.lastUpdateTime()
-    const timeSinceLastUpdate = now().sub(fsmLastUpdatedTime)
+    const fsmEthLastUpdatedTime = await this.fsmEth.lastUpdateTime()
+    const timeSinceLastUpdate = now().sub(fsmEthLastUpdatedTime)
 
     if (timeSinceLastUpdate.gte(this.maxUpdateNoUpdateInterval)) {
       // The fsm wasn't update in a very long time, more than the upper limit, update it now.
@@ -112,23 +121,72 @@ export class CollateralFsmPinger {
       // The fsm was update too recently, don't update.
       return false
     } else {
-      // we're between minUpdateInterval and maxUpdateNoUpdateInterval update only if the price deviation is large (more than minUpdateIntervalDeviation %).
-      const pendingFsmPrice = (await this.fsm.getNextResultWithValidity())[0] // RAY
-      const priceSourceAddress = await this.fsm.priceSource()
-      const priceRelayContract = this.transactor.getGebContract(
+      // we're between minUpdateInterval and maxUpdateNoUpdateInterval update only if any of the price deviations
+      // are large (more than minUpdateIntervalDeviation %).
+      // ETH
+      const pendingFsmEthPrice = (await this.fsmEth.getNextResultWithValidity())[0] // RAY
+      const ethPriceSourceAddress = await this.fsmEth.priceSource()
+      const ethPriceRelayContract = this.transactor.getGebContract(
         contracts.ChainlinkRelayer,
-        priceSourceAddress
+        ethPriceSourceAddress
       )
-      const nextPendingFsmPrice = (await priceRelayContract.getResultWithValidity())[0] // RAY
-
-      const priceDeviation = nextPendingFsmPrice
-        .sub(pendingFsmPrice)
+      const nextPendingFsmEthPrice = (await ethPriceRelayContract.getResultWithValidity())[0] // RAY
+      const ethPriceDeviation = nextPendingFsmEthPrice
+        .sub(pendingFsmEthPrice)
         .abs()
         .mul(utils.RAY)
-        .div(pendingFsmPrice)
+        .div(pendingFsmEthPrice)
+
+      // WSTETH
+      const pendingFsmWstEthPrice = (await this.fsmWstEth.getNextResultWithValidity())[0] // RAY
+      const wstethPriceSourceAddress = await this.fsmWstEth.priceSource()
+      const wstethPriceRelayContract = this.transactor.getGebContract(
+        contracts.ChainlinkRelayer,
+        wstethPriceSourceAddress
+      )
+      const nextPendingFsmWstEthPrice = (await wstethPriceRelayContract.getResultWithValidity())[0] // RAY
+      const wstethPriceDeviation = nextPendingFsmWstEthPrice
+        .sub(pendingFsmWstEthPrice)
+        .abs()
+        .mul(utils.RAY)
+        .div(pendingFsmWstEthPrice)
+
+      // RETH
+      const pendingFsmRethPrice = (await this.fsmReth.getNextResultWithValidity())[0] // RAY
+      const rethPriceSourceAddress = await this.fsmReth.priceSource()
+      const rethPriceRelayContract = this.transactor.getGebContract(
+        contracts.ChainlinkRelayer,
+        rethPriceSourceAddress
+      )
+      const nextPendingFsmRethPrice = (await rethPriceRelayContract.getResultWithValidity())[0] // RAY
+      const rethPriceDeviation = nextPendingFsmRethPrice
+        .sub(pendingFsmRethPrice)
+        .abs()
+        .mul(utils.RAY)
+        .div(pendingFsmRethPrice)
+
+      // RAI
+      const pendingFsmRaiPrice = (await this.fsmRai.getNextResultWithValidity())[0] // RAY
+      const raiPriceSourceAddress = await this.fsmRai.priceSource()
+      const raiPriceRelayContract = this.transactor.getGebContract(
+        contracts.ChainlinkRelayer,
+        raiPriceSourceAddress
+      )
+      const nextPendingFsmRaiPrice = (await raiPriceRelayContract.getResultWithValidity())[0] // RAY
+      const raiPriceDeviation = nextPendingFsmRaiPrice
+        .sub(pendingFsmRaiPrice)
+        .abs()
+        .mul(utils.RAY)
+        .div(pendingFsmRaiPrice)
 
       // If the price deviation is larger than the threshold..
-      if (utils.rayToFixed(priceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) {
+      if (utils.rayToFixed(ethPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) {
+        return true
+      } else if (utils.rayToFixed(wstethPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
+        return true
+      } else if (utils.rayToFixed(rethPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
+        return true
+      } else if (utils.rayToFixed(raiPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
         return true
       } else {
         return false
@@ -141,7 +199,7 @@ export class CollateralFsmPinger {
     const currentBlock = await this.transactor.getBlockNumber()
 
     // Get the latest OracleRelayer update events
-    // Assume a 13sec block interval
+    // Assume a 12sec block interval
     // Update if it has been more than the max OSM update interval + 30min
     // This is meant as a backup if somehow the piped update after the OSM one fails
     const scanFromBlock =

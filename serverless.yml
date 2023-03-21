@@ -1,4 +1,4 @@
-org: reflexer
+org: oddaf
 app: geb-pinger-bots
 service: geb-pinger-bots
 
@@ -10,18 +10,18 @@ provider:
   # This section is needed if you wish to give a dedicated IP to the lambda function
   # Useful if your ETH node is behind a firewall
   # Comment-out if not needed
-  vpc:
-    subnetIds:
+  #vpc:
+  #  subnetIds:
       # A VPC with a subnet needs to be manually configured on the AWS dashboard
       # The subnet needs a NAT gateway with internet access
-      - ${param:AWS_VPC_SUBNET_ID_1}
-      - ${param:AWS_VPC_SUBNET_ID_2}
-    securityGroupIds:
-      - ${param:AWS_SECURITY_GROUP}
+      #    - ${param:AWS_VPC_SUBNET_ID_1}
+      #- ${param:AWS_VPC_SUBNET_ID_2}
+      #securityGroupIds:
+      #- ${param:AWS_SECURITY_GROUP}
 
 custom:
   # Redirect to either to conf
-  kovan: ${self:custom.prod}
+  goerli: ${self:custom.prod}
   mainnet: ${self:custom.prod}
   
   custom:
@@ -29,7 +29,7 @@ custom:
     webpackConfig: './webpack.config.js'
     includeModules: true
 
-  # Fetch env vars from the severless dashboard (depends on the stage which can be either kovan or mainnet)
+  # Fetch env vars from the severless dashboard (depends on the stage which can be either goerli or mainnet)
   prod:
     NETWORK: ${opt:stage}
     ETH_RPC: ${param:ETH_RPC}
@@ -51,13 +51,13 @@ functions:
           enabled: ${file(./config/config.${opt:stage}.json):pingers.coinTwapAndRateSetter.enabled}
           rate: rate(${file(./config/config.${opt:stage}.json):pingers.coinTwapAndRateSetter.schedulerInterval} minutes)
 
-  updateETHFsm:
-    handler: src/index.updateETHFsm
+  updateFsms:
+    handler: src/index.updateFsms
     timeout: 240
     events:
       - schedule: 
-          enabled: ${file(./config/config.${opt:stage}.json):pingers.ethFsm.enabled}
-          rate: rate(${file(./config/config.${opt:stage}.json):pingers.ethFsm.schedulerInterval} minutes)
+          enabled: ${file(./config/config.${opt:stage}.json):pingers.collateralFsms.enabled}
+          rate: rate(${file(./config/config.${opt:stage}.json):pingers.collateralFsms.schedulerInterval} minutes)
 
   updateTaxCollector:
     handler: src/index.updateTaxCollector
@@ -139,30 +139,6 @@ functions:
           enabled: ${file(./config/config.${opt:stage}.json):pingers.debtAuctionInitialParameterSetter.enabled}
           rate: rate(${file(./config/config.${opt:stage}.json):pingers.debtAuctionInitialParameterSetter.schedulerInterval} minutes)
   
-  stakedTokensToKeepSetter:
-      handler: src/index.stakedTokensToKeepSetter
-      timeout: 240
-      events:
-        - schedule: 
-            enabled: ${file(./config/config.${opt:stage}.json):pingers.stakedTokensToKeepSetter.enabled}
-            rate: rate(${file(./config/config.${opt:stage}.json):pingers.stakedTokensToKeepSetter.schedulerInterval} minutes)
-  
-  stakeRewardRefill:
-    handler: src/index.stakeRewardRefill
-    timeout: 240
-    events:
-      - schedule: 
-          enabled: ${file(./config/config.${opt:stage}.json):pingers.stakeRewardRefill.enabled}
-          rate: rate(${file(./config/config.${opt:stage}.json):pingers.stakeRewardRefill.schedulerInterval} minutes)
-  
-  rewardAdjusterBundler:
-    handler: src/index.rewardAdjusterBundler
-    timeout: 240
-    events:
-      - schedule: 
-          enabled: ${file(./config/config.${opt:stage}.json):pingers.rewardAdjusterBundler.enabled}
-          rate: rate(${file(./config/config.${opt:stage}.json):pingers.rewardAdjusterBundler.schedulerInterval} minutes)
-
   redemptionPriceSnapOracle:
     handler: src/index.redemptionPriceSnapOracle
     timeout: 240

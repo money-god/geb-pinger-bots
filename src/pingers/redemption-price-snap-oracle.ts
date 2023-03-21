@@ -1,4 +1,4 @@
-import { contracts, TransactionRequest } from '@reflexer-finance/geb-admin'
+import { contracts, TransactionRequest } from '@money-god/geb-admin'
 import { BigNumber, ethers } from 'ethers'
 import { notifier } from '..'
 import { Transactor } from '../chains/transactor'

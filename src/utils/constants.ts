@@ -5,7 +5,7 @@ export const ZERO_BN = BigNumber.from(0)
 export const SECONDS_PER_DAY = 3600 * 24
 
 // In seconds
-export const APPROXIMATED_BLOCK_INTERVAL = 13
+export const APPROXIMATED_BLOCK_INTERVAL = 12
 // If a RPC did not reply within this timeout, start querying other nodes
 export const RPC_STALL_TIMEOUT = 3000
 // Timeout after which the RPC query is considered failed
