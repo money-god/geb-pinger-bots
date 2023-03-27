@@ -71,7 +71,7 @@ export const updateFsms = async () => {
     config.pingers.collateralFsms.fsmREthAddress,
     config.pingers.collateralFsms.fsmRaiAddress,
     config.pingers.collateralFsms.oracleRelayerAddress,
-    config.pingers.ethFsm.collateralType,
+    config.pingers.collateralFsms.collateralType,
     wallet,
     config.pingers.collateralFsms.minUpdateInterval * 60,
     config.pingers.collateralFsms.maxNoUpdateInterval * 60,

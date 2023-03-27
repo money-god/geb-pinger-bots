@@ -11,18 +11,18 @@
       "rewardReceiver": "0x7eb8caf136Ba45DD16483188cbe8b615f6251ca7"
     },
     "collateralFsms": {
-      "enabled": false,
+      "enabled": true,
       "schedulerInterval": 15,
       "minUpdateInterval": 60,
       "maxNoUpdateInterval": 180,
       "minUpdateIntervalDeviation": 0.04,
-      "fsmEthAddress": "0xfce9f3e16a291f0e7e47190c581c2447bfb5eba9",
-      "fsmWstEthAddress": "0x862aba9d6b11bf164a4b53d7d8d65a5346989030",
-      "fsmREthAddress": "0xb3e6dc592764ca07209be495dd5a3cc785a5da51",
+      "fsmEthAddress": "0xa4b396bbf114fe81fed339e329f137945d98677f",
+      "fsmWstEthAddress": "0xdb614931954152c8918d657d358a99a1d936f170",
+      "fsmREthAddress": "0x869bafc80bcce38772d63566e551e7ddefe649cd",
       "fsmRaiAddress": "0xd96c6276d4ed4a89d5bd7bc77e225e4711570833",
       "oracleRelayerAddress": "0xda4b192cb436c5429acc7799b68b307f66976a85",
-      "collateralType": "0x4554482d41000000000000000000000000000000000000000000000000000000",
-      "callBundlerAddress": null
+      "collateralType": "0x5753544554482d41000000000000000000000000000000000000000000000000",
+      "callBundlerAddress": "0xf00592841b4a5addce14da53022f427973df35f8"
     },
     "taxCollector": {
       "enabled": true,
@@ -32,7 +32,7 @@
       "collateralType": "0x4554482d41000000000000000000000000000000000000000000000000000000"
     },
     "stabilityFeeTreasury": {
-      "enabled": true,
+      "enabled": false,
       "schedulerInterval": 2880,
       "stabilityFeeTreasuryAddress": "0xba5501347644ff3ea46449a90327d75d32e55e95"
     },
@@ -101,7 +101,7 @@
       "mention": "U018QF2QUVA",
       "checks": [
         ["Coin twap", 1, 0.0],
-        ["FSMs", 2, 0],
+        ["FSMs", 2, 0.05],
         ["Tax collector", 4, 0.01],
         ["Pause executor", 5, 0.0],
         ["Stability fee treasury", 8, 0.01],

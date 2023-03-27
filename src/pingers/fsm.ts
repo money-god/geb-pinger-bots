@@ -52,6 +52,11 @@ export class CollateralFsmPinger {
         if (this.callBundlerAddress) {
           txFsm = await new ethers.Contract(this.callBundlerAddress, [
             'function updateAllOsmsAndCollateralTypes() external',
+            //'function updateEthOsmAndCollateralTypes() external',
+            //'function updateWstEthOsmCollateralTypes() external',
+            //'function updateREthOsmAndCollateralTypes() external',
+            //'function updateRaiOsmAndCollateralTypes() external',
+            //'function updateOsmsAndCollateralTypes(address[] calldata osms, bytes32[] calldata collateralTypes) external',
           ]).populateTransaction.updateAllOsmsAndCollateralTypes()
         } else {
           txFsm = this.fsmEth.updateResult()
@@ -76,8 +81,9 @@ export class CollateralFsmPinger {
       didUpdateFsm = true
       console.log(`FSM update sent, transaction hash: ${fsmHash}`)
     } else {
-      console.log('To early to update the FSM')
+      console.log('Too early to update the FSM')
     }
+    return
 
     // == Oracle Relayer ==
 
@@ -152,8 +158,8 @@ export class CollateralFsmPinger {
         .div(pendingFsmWstEthPrice)
 
       // RETH
-      const pendingFsmRethPrice = (await this.fsmReth.getNextResultWithValidity())[0] // RAY
-      const rethPriceSourceAddress = await this.fsmReth.priceSource()
+      const pendingFsmRethPrice = (await this.fsmREth.getNextResultWithValidity())[0] // RAY
+      const rethPriceSourceAddress = await this.fsmREth.priceSource()
       const rethPriceRelayContract = this.transactor.getGebContract(
         contracts.ChainlinkRelayer,
         rethPriceSourceAddress
