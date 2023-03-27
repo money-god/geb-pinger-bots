@@ -1,4 +1,4 @@
-pragma solidity ^0.6.7;
+pragma solidity ^0.8.13;
 
 interface ExternallyFundedOSM {
     function updateResult() external;
@@ -73,8 +73,8 @@ contract PingerBundledCall {
     bytes32 constant ETH_C = 0x4554482d43000000000000000000000000000000000000000000000000000000;
     bytes32 constant WSTETH_A = 0x5753544554482d41000000000000000000000000000000000000000000000000;
     bytes32 constant WSTETH_B = 0x5753544554482d42000000000000000000000000000000000000000000000000;
-    bytes32 constant RETH_A = 0x524554482d412d41000000000000000000000000000000000000000000000000;
-    bytes32 constant RETH_B = 0x524554482d412d42000000000000000000000000000000000000000000000000;
+    bytes32 constant RETH_A = 0x524554482d410000000000000000000000000000000000000000000000000000;
+    bytes32 constant RETH_B = 0x524554482d420000000000000000000000000000000000000000000000000000;
     bytes32 constant RAI_A =  0x5241492d41000000000000000000000000000000000000000000000000000000;
 
     // --- Events ---
@@ -84,7 +84,7 @@ contract PingerBundledCall {
 
     constructor(address osmEth_, address osmWstEth_, address osmREth_, address osmRai_,
                 address oracleRelayer_, address coinMedianizer_, address rateSetter_,
-                address rewardsSetter_, address _coinJoin, address _safeEngine, address _owner) public {
+                address rewardsSetter_, address _coinJoin, address _safeEngine) {
 
         authorizedAccounts[msg.sender] = 1;
 
@@ -100,8 +100,7 @@ contract PingerBundledCall {
         coinJoin = CoinJoin(_coinJoin);
         SafeEngine(_safeEngine).approveSAFEModification(_coinJoin);
 
-        owner = _owner;
-
+        owner = msg.sender;
         emit AddAuthorization(msg.sender);
     }
 
@@ -112,15 +111,15 @@ contract PingerBundledCall {
      */
     function modifyParameters(bytes32 parameter, address data) external isAuthorized {
         require(data != address(0), "PingerBundledCall/null-data");
-        if (parameter == "osmEth") osmEth = data;
-        else if (parameter == "osmWstEth") osmWstEth = data;
-        else if (parameter == "osmREth") osmREth = data;
-        else if (parameter == "osmRai") osmRai = data;
-        else if (parameter == "oracleRelayer") oracleRelayer = data;
-        else if (parameter == "coinMedianizer") coinMedianizer = data;
-        else if (parameter == "rateSetter") rateSetter = data;
-        else if (parameter == "rewardsSetter") rewardsSetter = data;
-        else if (parameter == "coinJoin") coinJoin = data;
+        if (parameter == "osmEth") osmEth = ExternallyFundedOSM(data);
+        else if (parameter == "osmWstEth") osmWstEth = ExternallyFundedOSM(data);
+        else if (parameter == "osmREth") osmREth = ExternallyFundedOSM(data);
+        else if (parameter == "osmRai") osmRai = ExternallyFundedOSM(data);
+        else if (parameter == "oracleRelayer") oracleRelayer = OracleRelayer(data);
+        else if (parameter == "coinMedianizer") coinMedianizer = CoinMedianizer(data);
+        else if (parameter == "rateSetter") rateSetter = RateSetter(data);
+        else if (parameter == "rewardsSetter") rewardsSetter = RewardsSetter(data);
+        else if (parameter == "coinJoin") coinJoin = CoinJoin(data);
         else revert("PingerBundledCall/modify-unrecognized-param");
         emit ModifyParameters(parameter, data);
     }
@@ -149,8 +148,8 @@ contract PingerBundledCall {
         oracleRelayer.updateCollateralPrice(RAI_A);
     }
 
-    function updateOsmsAndCollateralTypes(address[] osms, bytes32[] collateralTypes) external {
-        for (uint i; i < osm.length; i++) {
+    function updateOsmsAndCollateralTypes(address[] calldata osms, bytes32[] calldata collateralTypes) external {
+        for (uint i; i < osms.length; i++) {
             ExternallyFundedOSM(osms[i]).updateResult();
             oracleRelayer.updateCollateralPrice(collateralTypes[i]);
         }
@@ -183,7 +182,7 @@ contract PingerBundledCall {
     }
 
     function updateRewardSetter(address feeReceiver) external {
-        rewardSetter.updateRewards(feeReceiver);
+        rewardsSetter.updateRewards(feeReceiver);
     }
 
     function updateCoinMedianizerAndRateSetter(address feeReceiver) external {
@@ -193,13 +192,13 @@ contract PingerBundledCall {
 
     function updateCoinMedianizerAndRewardSetter(address feeReceiver) external {
         coinMedianizer.updateResult(feeReceiver);
-        rewardSetter.updateRewards(feeReceiver);
+        rewardsSetter.updateRewards(feeReceiver);
     }
 
     function updateCoinMedianizerRateAndRewardSetter(address feeReceiver) external {
         coinMedianizer.updateResult(feeReceiver);
         rateSetter.updateRate(feeReceiver);
-        rewardSetter.updateRewards(feeReceiver);
+        rewardsSetter.updateRewards(feeReceiver);
     }
 
     function withdrawPayout(address to, uint256 wad) external {
