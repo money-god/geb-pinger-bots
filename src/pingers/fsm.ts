@@ -14,6 +14,7 @@ export class CollateralFsmPinger {
   private fsmWstEth: contracts.Osm
   private fsmREth: contracts.Osm
   private fsmRai: contracts.Osm
+  private fsmCBEth: contracts.Osm
   private oracleRelayer: contracts.OracleRelayer
   private transactor: Transactor
 
@@ -22,6 +23,7 @@ export class CollateralFsmPinger {
     wstethOsmAddress: string,
     rethOsmAddress: string,
     raiOsmAddress: string,
+    cbethOsmAddress: string,
     oracleRelayerAddress: string,
     private collateralType: string,
     wallet: ethers.Signer,
@@ -35,6 +37,7 @@ export class CollateralFsmPinger {
     this.fsmWstEth = this.transactor.getGebContract(contracts.Osm, wstethOsmAddress)
     this.fsmREth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
     this.fsmRai = this.transactor.getGebContract(contracts.Osm, raiOsmAddress)
+    this.fsmCBEth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
     this.oracleRelayer = this.transactor.getGebContract(
       contracts.OracleRelayer,
       oracleRelayerAddress
@@ -185,6 +188,20 @@ export class CollateralFsmPinger {
         .mul(utils.RAY)
         .div(pendingFsmRaiPrice)
 
+      // CBETH
+      const pendingFsmCBethPrice = (await this.fsmCBEth.getNextResultWithValidity())[0] // RAY
+      const cbethPriceSourceAddress = await this.fsmCBEth.priceSource()
+      const cbethPriceRelayContract = this.transactor.getGebContract(
+        contracts.ChainlinkRelayer,
+        cbethPriceSourceAddress
+      )
+      const nextPendingFsmCBethPrice = (await cbethPriceRelayContract.getResultWithValidity())[0] // RAY
+      const cbethPriceDeviation = nextPendingFsmCBethPrice
+        .sub(pendingFsmCBethPrice)
+        .abs()
+        .mul(utils.RAY)
+        .div(pendingFsmCBethPrice)
+
       // If the price deviation is larger than the threshold..
       if (utils.rayToFixed(ethPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) {
         return true
@@ -193,6 +210,8 @@ export class CollateralFsmPinger {
       } else if (utils.rayToFixed(rethPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
         return true
       } else if (utils.rayToFixed(raiPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
+        return true
+      } else if (utils.rayToFixed(cbethPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
         return true
       } else {
         return false

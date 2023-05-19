@@ -16,11 +16,11 @@
       "minUpdateInterval": 240,
       "maxNoUpdateInterval": 480,
       "minUpdateIntervalDeviation": 0.04,
-      "fsmEthAddress": "0xa4b396bbf114fe81fed339e329f137945d98677f",
-      "fsmWstEthAddress": "0xdb614931954152c8918d657d358a99a1d936f170",
-      "fsmREthAddress": "0x869bafc80bcce38772d63566e551e7ddefe649cd",
-      "fsmRaiAddress": "0xd96c6276d4ed4a89d5bd7bc77e225e4711570833",
-      "oracleRelayerAddress": "0xda4b192cb436c5429acc7799b68b307f66976a85",
+      "fsmEthAddress": "0xdfe9c0b8cc0f25b116c4ecec4a3a38a4be7bc90a",
+      "fsmWstEthAddress": "0xbe7112463f5ed3872b55cc8f0cfa5cbc6b925996",
+      "fsmREthAddress": "0x819f94f4be3824b6f50a5748b9c12a0e97ab539a",
+      "fsmRaiAddress": "0xa662348fe4cd7430f7806e3b0852319f4476098f",
+      "oracleRelayerAddress": "0x19178d57e876b0be58f8b8d7684a806695b4875a",
       "collateralType": "0x5753544554482d41000000000000000000000000000000000000000000000000",
       "callBundlerAddress": "0xf00592841b4a5addce14da53022f427973df35f8"
     },
@@ -28,7 +28,7 @@
       "enabled": true,
       "schedulerInterval": 180,
       "minUpdateInterval": 1440,
-      "taxCollectorAddress": "0x40959807939e0adab57a1b603a2b2bbb929c59a1",
+      "taxCollectorAddress": "0xfe404b04beb7d147746777f83ae669882b8cc940",
       "collateralType": "0x4554482d41000000000000000000000000000000000000000000000000000000"
     },
     "stabilityFeeTreasury": {
@@ -44,8 +44,8 @@
     "debtSettler": {
       "enabled": true,
       "schedulerInterval": 60,
-      "accountingEngineAddress": "0x109acb6ddcd5f0cd2ba55010e634f20c65dfa5b5",
-      "safeEngineAddress": "0x3f7c6ae368102c80e451cddf1d243964ce77bafd"
+      "accountingEngineAddress": "0x8f103c23783fb787aebb31b594f36ca21fdb1a51",
+      "safeEngineAddress": "0xc1d9b3cc9819e51d35146da16dff6ad6604b7e83"
     },
     "ceilingSetter": {
       "enabled": false,
@@ -119,16 +119,16 @@
           240,
           "latestTimestamp"
         ],
-        ["eth_fsm", "0xa4b396bbf114fe81fed339e329f137945d98677f", 200],
+        ["eth_fsm", "0xdfe9c0b8cc0f25b116c4ecec4a3a38a4be7bc90a", 200],
         [
           "stability_fee_treasury_transfer_surplus",
-          "0xba5501347644ff3ea46449a90327d75d32e55e95",
+          "0x1e04c8521bcbae7e18778625e602c3d6044232da",
           347040,
           "latestSurplusTransferTime"
         ],
         [
           "tax_collector",
-          "0x40959807939e0adab57a1b603a2b2bbb929c59a1",
+          "0xfe404b04beb7d147746777f83ae669882b8cc940",
           1460,
           "0x4554482d41000000000000000000000000000000000000000000000000000000"
         ]

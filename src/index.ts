@@ -70,6 +70,7 @@ export const updateFsms = async () => {
     config.pingers.collateralFsms.fsmWstEthAddress,
     config.pingers.collateralFsms.fsmREthAddress,
     config.pingers.collateralFsms.fsmRaiAddress,
+    config.pingers.collateralFsms.fsmCBEthAddress,
     config.pingers.collateralFsms.oracleRelayerAddress,
     config.pingers.collateralFsms.collateralType,
     wallet,

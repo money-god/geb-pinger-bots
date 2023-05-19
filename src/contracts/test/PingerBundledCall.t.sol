@@ -30,6 +30,7 @@ contract PingerBundledCallTest is DSTest {
             address(0x92dC9b16be52De059279916c1eF810877f85F960),
             address(0x92dC9b16be52De059279916c1eF810877f85F960),
             address(0x92dC9b16be52De059279916c1eF810877f85F960),
+            address(0x92dC9b16be52De059279916c1eF810877f85F960),
             address(0x92dC9b16be52De059279916c1eF810877f85F960)
         );
 

@@ -7,18 +7,19 @@ contract GoerliDeploy is Script {
     }
 
     function run() public {
-        address osmEth = address(0xa4B396bbF114fE81fEd339E329f137945D98677f);
-        address osmWstEth = address(0xdB614931954152C8918d657d358a99A1D936F170);
-        address osmREth = address(0x869BAFC80BCCe38772d63566E551e7ddefE649cD);
-        address osmRai = address(0xd96c6276D4ED4A89d5BD7Bc77e225e4711570833);
-        address oracleRelayer = address(0xda4b192cB436c5429acc7799b68b307f66976a85);
+        address osmEth = address(0xaabF54Da611D8F8A8989b5A413e4bD1ACE058E79);
+        address osmWstEth = address(0xCb320D54d99250fD8D463B0Fea6785e44e78ce86);
+        address osmREth = address(0x7b7c098db146B204BD058d975C0F8cA7f7aABB55);
+        address osmCBEth = address(0x5bB796c1DCccbe9Ed7d77853Bb7B47ADb2651Ff8);
+        address osmRai = address(0x84383072692E56Ce9697fa76296512498baa1fdA);
+        address oracleRelayer = address(0x6aa9D2f366beaAEc40c3409E5926e831Ea42DC82);
         address coinMedianizer = address(1);
-        address rateSetter = address(0x871c8F54122BDFa68ca439afc2033f68F6AbE23d);
+        address rateSetter = address(0x8486459a8A03fbBfa9D9590aD9Dc4e239425E969);
         address rewardsSetter = address(1);
-        address coinJoin = address(0x6e027fcF681e9DB7eb41677Ebb82ea569F54C69C);
-        address safeEngine = address(0x3f7C6ae368102C80E451CddF1D243964CE77BaFD);
+        address coinJoin = address(0x3498503E58b65F3585C87780Aff380e061d55d23);
+        address safeEngine = address(0x3AD2F30266B35F775D58Aecde3fbB7ea8b83bF2b);
         vm.startBroadcast();
-        new PingerBundledCall(osmEth, osmWstEth, osmREth, osmRai, oracleRelayer, coinMedianizer,
+        new PingerBundledCall(osmEth, osmWstEth, osmREth, osmRai, osmCBEth, oracleRelayer, coinMedianizer,
                                                         rateSetter, rewardsSetter, coinJoin, safeEngine);
         vm.stopBroadcast();
     }
