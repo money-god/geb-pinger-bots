@@ -97,7 +97,7 @@ export class Transactor {
     // == Gas Price ==
 
     try {
-      const { maxFeePerGas, maxPriorityFeePerGas } = await this.blockNativeGasPrice(80)
+      const { maxFeePerGas, maxPriorityFeePerGas } = await this.blockNativeGasPrice(70)
       tx.maxFeePerGas = maxFeePerGas
       tx.maxPriorityFeePerGas = maxPriorityFeePerGas
     } catch {
