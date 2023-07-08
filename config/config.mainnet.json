@@ -12,7 +12,7 @@
     },
     "collateralFsms": {
       "enabled": true,
-      "schedulerInterval": 60,
+      "schedulerInterval": 240,
       "minUpdateInterval": 1440,
       "maxNoUpdateInterval": 2880,
       "minUpdateIntervalDeviation": 0.05,
@@ -27,8 +27,8 @@
     },
     "taxCollector": {
       "enabled": true,
-      "schedulerInterval": 180,
-      "minUpdateInterval": 1440,
+      "schedulerInterval": 1440,
+      "minUpdateInterval": 10800,
       "taxCollectorAddress": "0x3578743e922941911638a01521947ef1a81e0878",
       "collateralType": "0x4554482d41000000000000000000000000000000000000000000000000000000"
     },
@@ -44,7 +44,7 @@
     },
     "debtSettler": {
       "enabled": true,
-      "schedulerInterval": 60,
+      "schedulerInterval": 1440,
       "accountingEngineAddress": "0xdaf29a8bd397a4177c895c02f415ad9e4774c7b1",
       "safeEngineAddress": "0x3ad2f30266b35f775d58aecde3fbb7ea8b83bf2b"
     },

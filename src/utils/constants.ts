@@ -21,7 +21,7 @@ export const PENDING_TRANSACTION_GAS_BUMP_PERCENT = 30
 
 // Gas constants for each contract call
 // Naming pattern: <Contract name>__<function name>_GAS
-export const TAX_COLLECTOR__TAX_SINGLE_GAS = BigNumber.from('200000')
+export const TAX_COLLECTOR__TAX_SINGLE_GAS = BigNumber.from('60000')
 export const STABILITY_FEE_TREASURY__TRANSFER_SURPLUS_FUNDS_GAS = BigNumber.from('400000')
 export const RATE_SETTER__UPDATE_RATE_GAS = BigNumber.from('500000')
 export const COIN_TWAP__UPDATE_RESULTS_GAS = BigNumber.from('550000')

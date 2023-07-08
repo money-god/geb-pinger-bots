@@ -290,15 +290,20 @@ export class Transactor {
     maxPriorityFeePerGas: BigNumber
     maxFeePerGas: BigNumber
   }> {
+    /*  
     if (!process.env.BLOCKNATIVE_API_KEY) {
       throw Error('No blocknative key')
     }
+    */
 
     const url = 'https://api.blocknative.com/gasprices/blockprices'
+
     const resp = await axios.get(url, {
+     /*   
       headers: {
         Authorization: process.env.BLOCKNATIVE_API_KEY,
       },
+      */
     })
     const match = resp.data.blockPrices[0].estimatedPrices.find(
       (x: any) => x.confidence === nextBlockConfidence
