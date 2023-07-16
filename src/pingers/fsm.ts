@@ -54,34 +54,10 @@ export class CollateralFsmPinger {
       oracleRelayerAddress
     )
   }
-
-  public async ping() {
-    let didUpdateFsm = false
-    
-    await this.shouldCallOSMBundler('eth')
-    await this.shouldCallOSMBundler('wsteth')
-    await this.shouldCallOSMBundler('reth')
-    await this.shouldCallOSMBundler('cbeth')
-    await this.shouldCallOSMBundler('rai')
-    process.exit(0)
-    if (await this.shouldUpdateFsm()) {
-      // Simulate call
-      let txFsm: TransactionRequest
-      try {
-        // Use the call bundler if available
-        if (this.callBundlerAddress) {
-          txFsm = await new ethers.Contract(this.callBundlerAddress, [
-            'function updateAllOsmsAndCollateralTypes() external',
-            //'function updateEthOsmAndCollateralTypes() external',
-            //'function updateWstEthOsmCollateralTypes() external',
-            //'function updateREthOsmAndCollateralTypes() external',
-            //'function updateRaiOsmAndCollateralTypes() external',
-            //'function updateOsmsAndCollateralTypes(address[] calldata osms, bytes32[] calldata collateralTypes) external',
-          ]).populateTransaction.updateAllOsmsAndCollateralTypes()
-        } else {
-          txFsm = this.fsmEth.updateResult()
-        }
-        await this.transactor.ethCall(txFsm)
+     
+  private async tryUpdateBundler(tx) {
+    try {
+        await this.transactor.ethCall(tx)
       } catch (err) {
         if (
           typeof err == 'string' &&
@@ -96,39 +72,39 @@ export class CollateralFsmPinger {
         return
       }
 
-      // Send FSM transaction
-      let fsmHash = await this.transactor.ethSend(txFsm, true, COLLATERAL_FSM__UPDATE_RESULTS_GAS * 4)
-      didUpdateFsm = true
-      console.log(`FSM update sent, transaction hash: ${fsmHash}`)
-    } else {
-      console.log('Too early to update the FSM')
-    }
-    return
+    let txHash = await this.transactor.ethSend(tx, true, COLLATERAL_FSM__UPDATE_RESULTS_GAS*4)
+    console.log(`FSM update sent, transaction hash: ${txHash}`)
 
-    // == Oracle Relayer ==
+  }
 
-    let shouldUpdateOracleRelayer = await this.shouldUpdateOracleRelayer()
-    if (this.callBundlerAddress) {
-      // If we're using the call bundler, no need to update the FSM unless we're late
-      shouldUpdateOracleRelayer = shouldUpdateOracleRelayer && !didUpdateFsm
-    } else {
-      // Without call bundler we need to update the oracle relayer after a call to the fsm
-      shouldUpdateOracleRelayer = shouldUpdateOracleRelayer || didUpdateFsm
-    }
+  public async ping() {
 
-    // Update the OracleRelayer if we just updated a FSM OR if the relayer is stale
-    if (shouldUpdateOracleRelayer) {
-      let txRelayer = this.oracleRelayer.updateCollateralPrice(this.collateralType)
-      // Send the OracleRelayer transaction
-      let relayerHash = await await this.transactor.ethSend(
-        txRelayer,
-        !didUpdateFsm,
-        ORACLE_RELAYER__UPDATE_COLLATERAL_PRICE_GAS
-      )
-      console.log(`OracleRelayer update sent, transaction hash: ${relayerHash}`)
-    } else {
-      console.log('Too early to update the OracleRelayer')
-    }
+  if (await this.shouldCallOSMBundler('eth')) {
+      /*
+    tx = await new ethers.Contract(this.ethBundlerAddress, [
+      'function call() external',
+    ]).populateTransaction.call()
+    */
+    tx = await this.ethBundler.populateTransaction.call()
+    tryUpdateBundler(tx)
+  }
+  if (await this.shouldCallOSMBundler('wsteth')) {
+    tx = await this.wstethBundler.populateTransaction.call()
+    tryUpdateBundler(tx)
+  }
+  if (await this.shouldCallOSMBundler('reth')) {
+    tx = await this.rethBundler.populateTransaction.call()
+    tryUpdateBundler(tx)
+  }
+  if (await this.shouldCallOSMBundler('cbeth')) {
+    tx = await this.cbethBundler.populateTransaction.call()
+    tryUpdateBundler(tx)
+  }
+  if (await this.shouldCallOSMBundler('rai')) {
+    tx = await this.raiBundler.populateTransaction.call()
+    tryUpdateBundler(tx)
+  }
+
   }
 
   // Evaluate wether we should update the FSM or not
@@ -262,6 +238,7 @@ export class CollateralFsmPinger {
 
     if (timeSinceLastUpdate.lt(this.minUpdateInterval)) {
       // The fsm was update too recently, don't update.
+      console.log(`${collateral} too soon to update. Time since update: ${timeSinceLastUpdate}`)
       return false
     } else {
       // update only if any of the price deviations
@@ -283,6 +260,7 @@ export class CollateralFsmPinger {
       if (utils.rayToFixed(priceDeviation).toUnsafeFloat() >= (await bundler.acceptedDeviation()).toNumber()/1000) {
         return true
       } else {
+        console.log(`${collateral} deviation not enough. Current deviation: ${utils.rayToFixed(priceDeviation).toUnsafeFloat()}`)
         return false
       }
     }
