@@ -24,6 +24,11 @@ export class CollateralFsmPinger {
     rethOsmAddress: string,
     raiOsmAddress: string,
     cbethOsmAddress: string,
+    ethBundlerAddress: string,
+    wstethBundlerAddress: string,
+    rethBundlerAddress: string,
+    cbethBundlerAddress: string,
+    raiBundlerAddress: string,
     oracleRelayerAddress: string,
     private collateralType: string,
     wallet: ethers.Signer,
@@ -38,6 +43,12 @@ export class CollateralFsmPinger {
     this.fsmREth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
     this.fsmRai = this.transactor.getGebContract(contracts.Osm, raiOsmAddress)
     this.fsmCBEth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
+    this.ethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, ethBundlerAddress)
+    this.wstethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, wstethBundlerAddress)
+    this.rethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, rethBundlerAddress)
+    this.cbethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, cbethBundlerAddress)
+    this.raiBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, raiBundlerAddress)
+
     this.oracleRelayer = this.transactor.getGebContract(
       contracts.OracleRelayer,
       oracleRelayerAddress
@@ -46,7 +57,13 @@ export class CollateralFsmPinger {
 
   public async ping() {
     let didUpdateFsm = false
-
+    
+    await this.shouldCallOSMBundler('eth')
+    await this.shouldCallOSMBundler('wsteth')
+    await this.shouldCallOSMBundler('reth')
+    await this.shouldCallOSMBundler('cbeth')
+    await this.shouldCallOSMBundler('rai')
+    process.exit(0)
     if (await this.shouldUpdateFsm()) {
       // Simulate call
       let txFsm: TransactionRequest
@@ -212,6 +229,58 @@ export class CollateralFsmPinger {
       } else if (utils.rayToFixed(raiPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
         return true
       } else if (utils.rayToFixed(cbethPriceDeviation).toUnsafeFloat() >= this.minUpdateIntervalDeviation) { 
+        return true
+      } else {
+        return false
+      }
+    }
+  }
+
+  // Evaluate wether we should update the FSM or not
+  private async shouldCallOSMBundler(collateral: string) {
+    var fsm;
+    var bundler;
+    if (collateral == 'eth') {
+        fsm = this.fsmEth
+        bundler = this.ethBundler
+    } else if (collateral == 'wsteth') {
+        fsm = this.fsmWstEth
+        bundler = this.wstethBundler
+    } else if (collateral == 'reth') {
+        fsm = this.fsmREth
+        bundler = this.rethBundler
+    } else if (collateral == 'cbeth') {
+        fsm = this.fsmCBEth
+        bundler = this.cbethBundler
+    } else if (collateral == 'rai') {
+        fsm = this.fsmRai
+        bundler = this.raiBundler
+    }
+
+    const fsmLastUpdatedTime = await fsm.lastUpdateTime()
+    const timeSinceLastUpdate = now().sub(fsmLastUpdatedTime)
+
+    if (timeSinceLastUpdate.lt(this.minUpdateInterval)) {
+      // The fsm was update too recently, don't update.
+      return false
+    } else {
+      // update only if any of the price deviations
+      // are large (more than bundler.acceptedDeviation %).
+      const pendingFsmPrice = (await fsm.getNextResultWithValidity())[0] // RAY
+      const priceSourceAddress = await fsm.priceSource()
+      const priceRelayContract = this.transactor.getGebContract(
+        contracts.ChainlinkRelayer,
+        priceSourceAddress
+      )
+      const nextPendingFsmPrice = (await priceRelayContract.getResultWithValidity())[0] // RAY
+      const priceDeviation = nextPendingFsmPrice
+        .sub(pendingFsmPrice)
+        .abs()
+        .mul(utils.RAY)
+        .div(pendingFsmPrice)
+
+      // If the price deviation is larger than the rewards threshold..
+      if (utils.rayToFixed(priceDeviation).toUnsafeFloat() >= (await bundler.acceptedDeviation()).toNumber()/1000) {
         return true
       } else {
         return false

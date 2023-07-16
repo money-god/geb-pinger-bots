@@ -21,6 +21,11 @@
       "fsmREthAddress": "0x7b7c098db146b204bd058d975c0f8ca7f7aabb55",
       "fsmCBEthAddress": "0x5bb796c1dcccbe9ed7d77853bb7b47adb2651ff8",
       "fsmRaiAddress": "0x84383072692e56ce9697fa76296512498baa1fda",
+      "ethBundlerAddress": "0xFc78661d9268300aD16841209EB592337d4C5542",
+      "wstethBundlerAddress": "0xd1Df22e4F9dA364bd75054F7458c08578103c870",
+      "rethBundlerAddress": "0x419f4b965A650d5a0fcD8e75C9a80aD222095ADa",
+      "cbethBundlerAddress": "0x59335472f7E399083cD3f6AE54F6A6E769Af5937",
+      "raiBundlerAddress": "0x8eFACf660116167d31BB0A0050E420DcF268f464",
       "oracleRelayerAddress": "0x6aa9d2f366beaaec40c3409e5926e831ea42dc82",
       "collateralType": "0x5753544554482d41000000000000000000000000000000000000000000000000",
       "callBundlerAddress": "0x11d0c403c37a075e6e282061651723fa8c46b81a"
