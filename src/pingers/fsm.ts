@@ -78,32 +78,43 @@ export class CollateralFsmPinger {
   }
 
   public async ping() {
+    var tx;
 
-  if (await this.shouldCallOSMBundler('eth')) {
-      /*
-    tx = await new ethers.Contract(this.ethBundlerAddress, [
-      'function call() external',
-    ]).populateTransaction.call()
-    */
-    tx = await this.ethBundler.populateTransaction.call()
-    tryUpdateBundler(tx)
-  }
-  if (await this.shouldCallOSMBundler('wsteth')) {
-    tx = await this.wstethBundler.populateTransaction.call()
-    tryUpdateBundler(tx)
-  }
-  if (await this.shouldCallOSMBundler('reth')) {
-    tx = await this.rethBundler.populateTransaction.call()
-    tryUpdateBundler(tx)
-  }
-  if (await this.shouldCallOSMBundler('cbeth')) {
-    tx = await this.cbethBundler.populateTransaction.call()
-    tryUpdateBundler(tx)
-  }
-  if (await this.shouldCallOSMBundler('rai')) {
-    tx = await this.raiBundler.populateTransaction.call()
-    tryUpdateBundler(tx)
-  }
+    if (await this.shouldCallOSMBundler('eth')) {
+      console.log("Updating eth")
+      tx = await new ethers.Contract(this.ethBundler.address, [
+        'function call() external',
+      ]).populateTransaction.call()
+      this.tryUpdateBundler(tx)
+    }
+    if (await this.shouldCallOSMBundler('wsteth')) {
+      console.log("Updating wsteth")
+      tx = await new ethers.Contract(this.wstethBundler.address, [
+        'function call() external',
+      ]).populateTransaction.call()
+      this.tryUpdateBundler(tx)
+    }
+    if (await this.shouldCallOSMBundler('reth')) {
+      console.log("Updating reth")
+      tx = await new ethers.Contract(this.rethBundler.address, [
+        'function call() external',
+      ]).populateTransaction.call()
+      this.tryUpdateBundler(tx)
+    }
+    if (await this.shouldCallOSMBundler('cbeth')) {
+      console.log("Updating cbeth")
+      tx = await new ethers.Contract(this.cbethBundler.address, [
+        'function call() external',
+      ]).populateTransaction.call()
+      this.tryUpdateBundler(tx)
+    }
+    if (await this.shouldCallOSMBundler('rai')) {
+      console.log("Updating rai")
+      tx = await new ethers.Contract(this.raiBundler.address, [
+        'function call() external',
+      ]).populateTransaction.call()
+      this.tryUpdateBundler(tx)
+    }
 
   }
 
@@ -258,6 +269,7 @@ export class CollateralFsmPinger {
 
       // If the price deviation is larger than the rewards threshold..
       if (utils.rayToFixed(priceDeviation).toUnsafeFloat() >= (await bundler.acceptedDeviation()).toNumber()/1000) {
+        console.log(`${collateral} deviation is large enough. Current deviation: ${utils.rayToFixed(priceDeviation).toUnsafeFloat()}`)
         return true
       } else {
         console.log(`${collateral} deviation not enough. Current deviation: ${utils.rayToFixed(priceDeviation).toUnsafeFloat()}`)
