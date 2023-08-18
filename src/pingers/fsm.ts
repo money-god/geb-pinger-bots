@@ -72,7 +72,7 @@ export class CollateralFsmPinger {
         return
       }
 
-    let txHash = await this.transactor.ethSend(tx, true, COLLATERAL_FSM__UPDATE_RESULTS_GAS*4)
+    let txHash = await this.transactor.ethSend(tx, false, COLLATERAL_FSM__UPDATE_RESULTS_GAS*4)
     console.log(`FSM update sent, transaction hash: ${txHash}`)
 
   }

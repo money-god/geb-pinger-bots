@@ -13,7 +13,7 @@
     "collateralFsms": {
       "enabled": true,
       "schedulerInterval": 240,
-      "minUpdateInterval": 1440,
+      "minUpdateInterval": 240,
       "maxNoUpdateInterval": 2880,
       "minUpdateIntervalDeviation": 0.05,
       "fsmEthAddress": "0xaabf54da611d8f8a8989b5a413e4bd1ace058e79",
