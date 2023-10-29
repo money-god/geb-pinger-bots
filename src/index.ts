@@ -6,7 +6,7 @@ import { Notifier } from './notifications/notifier'
 //import { CollateralAuctionThrottler } from './pingers/collateral-auction-throttler'
 import { DebtSettler } from './pingers/debt-pinger'
 import { CollateralFsmPinger } from './pingers/fsm'
-//import { CoinTwapAndRateSetter } from './pingers/coin-twap-and-rate-setter'
+import { CoinTwapAndRateSetter } from './pingers/coin-twap-and-rate-setter-new'
 //import { PauseExecutor } from './pingers/pause-executor'
 import { StabilityFeeTreasuryPinger } from './pingers/stability-fee-treasury'
 import { TaxCollectorPinger } from './pingers/tax-collector'
@@ -47,12 +47,10 @@ export const updateCoinTwapAndRateSetter = async () => {
     env.NETWORK
   )
   const pinger = new CoinTwapAndRateSetter(
-    config.pingers.coinTwapAndRateSetter.coinTwapAddress,
-    config.pingers.coinTwapAndRateSetter.rateSetterAddress,
+    config.pingers.coinTwapAndRateSetter.ethTwapAddress,
+    config.pingers.coinTwapAndRateSetter.twapRateBundlerAddress,
     wallet,
     config.pingers.coinTwapAndRateSetter.minUpdateIntervalTwap * 60,
-    config.pingers.coinTwapAndRateSetter.minUpdateIntervalRateSetter * 60,
-    config.pingers.coinTwapAndRateSetter.rewardReceiver
   )
   await pinger.ping()
 }

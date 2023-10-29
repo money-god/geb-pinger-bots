@@ -55,7 +55,7 @@ export class CollateralFsmPinger {
     )
   }
      
-  private async tryUpdateBundler(tx) {
+  private async tryUpdateBundler(tx, collateral) {
     try {
         await this.transactor.ethCall(tx)
       } catch (err) {
@@ -73,7 +73,7 @@ export class CollateralFsmPinger {
       }
 
     let txHash = await this.transactor.ethSend(tx, false, COLLATERAL_FSM__UPDATE_RESULTS_GAS*4)
-    console.log(`FSM update sent, transaction hash: ${txHash}`)
+    console.log(`${collateral} FSM update sent, transaction hash: ${txHash}`)
 
   }
 
@@ -85,35 +85,35 @@ export class CollateralFsmPinger {
       tx = await new ethers.Contract(this.ethBundler.address, [
         'function call() external',
       ]).populateTransaction.call()
-      this.tryUpdateBundler(tx)
+      this.tryUpdateBundler(tx, 'eth')
     }
     if (await this.shouldCallOSMBundler('wsteth')) {
       console.log("Updating wsteth")
       tx = await new ethers.Contract(this.wstethBundler.address, [
         'function call() external',
       ]).populateTransaction.call()
-      this.tryUpdateBundler(tx)
+      this.tryUpdateBundler(tx, 'wsteth')
     }
     if (await this.shouldCallOSMBundler('reth')) {
       console.log("Updating reth")
       tx = await new ethers.Contract(this.rethBundler.address, [
         'function call() external',
       ]).populateTransaction.call()
-      this.tryUpdateBundler(tx)
+      this.tryUpdateBundler(tx, 'reth')
     }
     if (await this.shouldCallOSMBundler('cbeth')) {
       console.log("Updating cbeth")
       tx = await new ethers.Contract(this.cbethBundler.address, [
         'function call() external',
       ]).populateTransaction.call()
-      this.tryUpdateBundler(tx)
+      this.tryUpdateBundler(tx, 'cbeth')
     }
     if (await this.shouldCallOSMBundler('rai')) {
       console.log("Updating rai")
       tx = await new ethers.Contract(this.raiBundler.address, [
         'function call() external',
       ]).populateTransaction.call()
-      this.tryUpdateBundler(tx)
+      this.tryUpdateBundler(tx, 'rai')
     }
 
   }
@@ -254,25 +254,38 @@ export class CollateralFsmPinger {
     } else {
       // update only if any of the price deviations
       // are large (more than bundler.acceptedDeviation %).
-      const pendingFsmPrice = (await fsm.getNextResultWithValidity())[0] // RAY
+      // current FSM Price
+      const currentFsmPrice = (await fsm.getResultWithValidity())[0] // RAY
+      // next FSM Price
+      const nextFsmPrice = (await fsm.getNextResultWithValidity())[0] // RAY
       const priceSourceAddress = await fsm.priceSource()
       const priceRelayContract = this.transactor.getGebContract(
         contracts.ChainlinkRelayer,
         priceSourceAddress
       )
-      const nextPendingFsmPrice = (await priceRelayContract.getResultWithValidity())[0] // RAY
-      const priceDeviation = nextPendingFsmPrice
-        .sub(pendingFsmPrice)
+      // market price
+      const marketFsmPrice = (await priceRelayContract.getResultWithValidity())[0] // RAY
+      const marketPriceDeviation = marketFsmPrice
+        .sub(currentFsmPrice)
         .abs()
         .mul(utils.RAY)
-        .div(pendingFsmPrice)
-
+        .div(currentFsmPrice)
+      const nextPriceDeviation = nextFsmPrice
+        .sub(currentFsmPrice)
+        .abs()
+        .mul(utils.RAY)
+        .div(currentFsmPrice)
+       
+      console.log(`${collateral} currentFsmPrice: ${currentFsmPrice}, nextFsmPrice: ${nextFsmPrice}, market: ${marketFsmPrice}`)
       // If the price deviation is larger than the rewards threshold..
-      if (utils.rayToFixed(priceDeviation).toUnsafeFloat() >= (await bundler.acceptedDeviation()).toNumber()/1000) {
-        console.log(`${collateral} deviation is large enough. Current deviation: ${utils.rayToFixed(priceDeviation).toUnsafeFloat()}`)
+      if (utils.rayToFixed(marketPriceDeviation).toUnsafeFloat() >= (await bundler.acceptedDeviation()).toNumber()/1000) {
+        console.log(`${collateral} deviation is large enough. next price deviation: ${(utils.rayToFixed(nextPriceDeviation).toUnsafeFloat()).toFixed(2)} market deviation: ${(utils.rayToFixed(marketPriceDeviation).toUnsafeFloat()).toFixed(2)}`)
+        return true
+      } else if (utils.rayToFixed(nextPriceDeviation).toUnsafeFloat() >= (await bundler.acceptedDeviation()).toNumber()/1000) {
+        console.log(`${collateral} deviation is large enough. next price deviation: ${(utils.rayToFixed(nextPriceDeviation).toUnsafeFloat()).toFixed(2)} market deviation: ${(utils.rayToFixed(marketPriceDeviation).toUnsafeFloat()).toFixed(2)}`)
         return true
       } else {
-        console.log(`${collateral} deviation not enough. Current deviation: ${utils.rayToFixed(priceDeviation).toUnsafeFloat()}`)
+        console.log(`${collateral} deviation not large enough. next price deviation: ${(utils.rayToFixed(nextPriceDeviation).toUnsafeFloat()).toFixed(2)} market deviation: ${(utils.rayToFixed(marketPriceDeviation).toUnsafeFloat()).toFixed(2)}`)
         return false
       }
     }

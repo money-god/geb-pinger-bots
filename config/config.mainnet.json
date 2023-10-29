@@ -2,13 +2,12 @@
   "graphNodes": ["https://subgraph-goerli.tai.money/subgraphs/name/tai"],
   "pingers": {
     "coinTwapAndRateSetter": {
-      "enabled": false,
-      "schedulerInterval": 15,
-      "minUpdateIntervalTwap": 180,
-      "minUpdateIntervalRateSetter": 360,
-      "coinTwapAddress": "0xcede0Fa68bCCc0910d5355725BfDb7AdAfC7Aeb3",
-      "rateSetterAddress": "0x97533CD0c5997bce2504378CB29a091830de0F94",
-      "rewardReceiver": "0x7eb8caf136Ba45DD16483188cbe8b615f6251ca7"
+      "enabled": true,
+      "schedulerInterval": 30,
+      "minUpdateIntervalTwap": 720,
+      "ethTwapAddress": "0x0d7b4A10dFF52e85e9FB7e1b030C8c2dD96E0AdD",
+      "rateSetterAddress": "0x98820Ba03E8dbC8614509685e88aa3035640EcA1",
+      "twapRateBundlerAddress": "0xB5e4196291cDA44329DBe70C1418747917ec813b"
     },
     "collateralFsms": {
       "enabled": true,
