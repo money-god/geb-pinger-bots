@@ -4,7 +4,7 @@
     "coinTwapAndRateSetter": {
       "enabled": true,
       "schedulerInterval": 30,
-      "minUpdateIntervalTwap": 720,
+      "minUpdateIntervalTwap": 1080,
       "ethTwapAddress": "0x0d7b4A10dFF52e85e9FB7e1b030C8c2dD96E0AdD",
       "rateSetterAddress": "0x98820Ba03E8dbC8614509685e88aa3035640EcA1",
       "twapRateBundlerAddress": "0xB5e4196291cDA44329DBe70C1418747917ec813b"
@@ -14,7 +14,7 @@
       "schedulerInterval": 240,
       "minUpdateInterval": 240,
       "maxNoUpdateInterval": 2880,
-      "minUpdateIntervalDeviation": 0.05,
+      "minUpdateIntervalDeviation": 0.07,
       "fsmEthAddress": "0xaabf54da611d8f8a8989b5a413e4bd1ace058e79",
       "fsmWstEthAddress": "0xcb320d54d99250fd8d463b0fea6785e44e78ce86",
       "fsmREthAddress": "0x7b7c098db146b204bd058d975c0f8ca7f7aabb55",

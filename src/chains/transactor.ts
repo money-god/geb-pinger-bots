@@ -56,7 +56,8 @@ export class Transactor {
     tx: ethers.providers.TransactionRequest,
     // If set to true, the current confirmed nonce will be used and potentially override pending transactions
     forceOverride: boolean,
-    gasLimit?: BigNumber
+    gasLimit?: BigNumber,
+    maxFee: BigNumber = BigNumber.from(35 * 1e9),
   ): Promise<string> {
     // Sanity checks
     if (!this.signer) {
@@ -97,9 +98,10 @@ export class Transactor {
     // == Gas Price ==
 
     try {
-      const { maxFeePerGas, maxPriorityFeePerGas } = await this.blockNativeGasPrice(70)
+      const { price, maxFeePerGas, maxPriorityFeePerGas } = await this.blockNativeGasPrice(70)
       tx.maxFeePerGas = maxFeePerGas
-      tx.maxPriorityFeePerGas = maxPriorityFeePerGas
+      //tx.maxPriorityFeePerGas = maxPriorityFeePerGas
+      tx.maxPriorityFeePerGas = BigNumber.from(0.1 * 1e9)
     } catch {
       tx = await this.signer.populateTransaction(tx)
     } finally {
@@ -108,6 +110,12 @@ export class Transactor {
         await notifier.sendError(err)
         throw err
       }
+    }
+
+    if (tx.maxFeePerGas && (tx.maxFeePerGas > maxFee)) {
+      const err = `maxFeePerGas ${tx.maxFeePerGas} is higher than maxFee ${maxFee}.`
+      await notifier.sendError(err)
+      throw err
     }
 
     const bumpGasPrice = async (tx: ethers.providers.TransactionRequest) => {
@@ -313,9 +321,9 @@ export class Transactor {
     if (match) {
       console.log(match)
       return {
-        price: BigNumber.from(match.price + e9),
-        maxFeePerGas: BigNumber.from(match.maxFeePerGas + e9),
-        maxPriorityFeePerGas: BigNumber.from(match.maxPriorityFeePerGas + e9),
+        price: BigNumber.from(match.price * 1e9),
+        maxFeePerGas: BigNumber.from(match.maxFeePerGas * 1e9),
+        maxPriorityFeePerGas: BigNumber.from(match.maxPriorityFeePerGas * 1e9),
       }
     } else {
       throw Error('Blocknative broken API')

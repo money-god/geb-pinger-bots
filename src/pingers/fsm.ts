@@ -42,7 +42,7 @@ export class CollateralFsmPinger {
     this.fsmWstEth = this.transactor.getGebContract(contracts.Osm, wstethOsmAddress)
     this.fsmREth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
     this.fsmRai = this.transactor.getGebContract(contracts.Osm, raiOsmAddress)
-    this.fsmCBEth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
+    this.fsmCBEth = this.transactor.getGebContract(contracts.Osm, cbethOsmAddress)
     this.ethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, ethBundlerAddress)
     this.wstethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, wstethBundlerAddress)
     this.rethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, rethBundlerAddress)
@@ -71,7 +71,6 @@ export class CollateralFsmPinger {
         }
         return
       }
-
     let txHash = await this.transactor.ethSend(tx, false, COLLATERAL_FSM__UPDATE_RESULTS_GAS*4)
     console.log(`${collateral} FSM update sent, transaction hash: ${txHash}`)
 
@@ -118,6 +117,7 @@ export class CollateralFsmPinger {
 
   }
 
+  /*
   // Evaluate wether we should update the FSM or not
   private async shouldUpdateFsm() {
     if (await this.transactor.isAnyTransactionPending()) {
@@ -222,7 +222,7 @@ export class CollateralFsmPinger {
       }
     }
   }
-
+  */
   // Evaluate wether we should update the FSM or not
   private async shouldCallOSMBundler(collateral: string) {
     var fsm;
@@ -245,6 +245,7 @@ export class CollateralFsmPinger {
     }
 
     const fsmLastUpdatedTime = await fsm.lastUpdateTime()
+    console.log(`${collateral} fsm ${fsm.address} fsmLastUpdatedTime: ${fsmLastUpdatedTime}`)
     const timeSinceLastUpdate = now().sub(fsmLastUpdatedTime)
 
     if (timeSinceLastUpdate.lt(this.minUpdateInterval)) {
