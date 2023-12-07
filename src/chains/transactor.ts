@@ -57,7 +57,7 @@ export class Transactor {
     // If set to true, the current confirmed nonce will be used and potentially override pending transactions
     forceOverride: boolean,
     gasLimit?: BigNumber,
-    maxFee: BigNumber = BigNumber.from(35 * 1e9),
+    maxCurrentBaseFee: BigNumber = BigNumber.from(40 * 1e9),
   ): Promise<string> {
     // Sanity checks
     if (!this.signer) {
@@ -96,9 +96,10 @@ export class Transactor {
     tx.gasLimit = gasLimit
 
     // == Gas Price ==
+    const baseFee = BigNumber.from(100000 * 1e9);
 
     try {
-      const { price, maxFeePerGas, maxPriorityFeePerGas } = await this.blockNativeGasPrice(70)
+      const { baseFee, maxFeePerGas, maxPriorityFeePerGas } = await this.blockNativeGasPrice(70)
       tx.maxFeePerGas = maxFeePerGas
       //tx.maxPriorityFeePerGas = maxPriorityFeePerGas
       tx.maxPriorityFeePerGas = BigNumber.from(0.1 * 1e9)
@@ -112,8 +113,8 @@ export class Transactor {
       }
     }
 
-    if (tx.maxFeePerGas && (tx.maxFeePerGas > maxFee)) {
-      const err = `maxFeePerGas ${tx.maxFeePerGas} is higher than maxFee ${maxFee}.`
+    if (baseFee && (baseFee > maxCurrentBaseFee)) {
+      const err = `baseFee ${baseFee} is higher than maxCurrentBaseFee ${maxCurrentBaseFee}.`
       await notifier.sendError(err)
       throw err
     }
@@ -294,7 +295,7 @@ export class Transactor {
   }
 
   private async blockNativeGasPrice(nextBlockConfidence: 70 | 80 | 90 | 95 | 99): Promise<{
-    price: BigNumber
+    baseFee: BigNumber
     maxPriorityFeePerGas: BigNumber
     maxFeePerGas: BigNumber
   }> {
@@ -316,12 +317,14 @@ export class Transactor {
     const match = resp.data.blockPrices[0].estimatedPrices.find(
       (x: any) => x.confidence === nextBlockConfidence
     )
+    const baseFee = BigNumber.from(resp.data.blockPrices[0].baseFeePerGas * 1e9);
 
     const e9 = '000000000'
     if (match) {
       console.log(match)
       return {
-        price: BigNumber.from(match.price * 1e9),
+        //price: BigNumber.from(match.price * 1e9),
+        baseFee,
         maxFeePerGas: BigNumber.from(match.maxFeePerGas * 1e9),
         maxPriorityFeePerGas: BigNumber.from(match.maxPriorityFeePerGas * 1e9),
       }
