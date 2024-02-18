@@ -57,7 +57,7 @@ export class Transactor {
     // If set to true, the current confirmed nonce will be used and potentially override pending transactions
     forceOverride: boolean,
     gasLimit?: BigNumber,
-    maxCurrentBaseFee: BigNumber = BigNumber.from(40 * 1e9),
+    maxCurrentBaseFee: BigNumber = BigNumber.from(50 * 1e9),
   ): Promise<string> {
     // Sanity checks
     if (!this.signer) {

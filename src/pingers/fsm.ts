@@ -15,6 +15,7 @@ export class CollateralFsmPinger {
   private fsmREth: contracts.Osm
   private fsmRai: contracts.Osm
   private fsmCBEth: contracts.Osm
+  private fsmOEth: contracts.Osm
   private oracleRelayer: contracts.OracleRelayer
   private transactor: Transactor
 
@@ -24,10 +25,12 @@ export class CollateralFsmPinger {
     rethOsmAddress: string,
     raiOsmAddress: string,
     cbethOsmAddress: string,
+    oethOsmAddress: string,
     ethBundlerAddress: string,
     wstethBundlerAddress: string,
     rethBundlerAddress: string,
     cbethBundlerAddress: string,
+    oethBundlerAddress: string,
     raiBundlerAddress: string,
     oracleRelayerAddress: string,
     private collateralType: string,
@@ -43,10 +46,12 @@ export class CollateralFsmPinger {
     this.fsmREth = this.transactor.getGebContract(contracts.Osm, rethOsmAddress)
     this.fsmRai = this.transactor.getGebContract(contracts.Osm, raiOsmAddress)
     this.fsmCBEth = this.transactor.getGebContract(contracts.Osm, cbethOsmAddress)
+    this.fsmOEth = this.transactor.getGebContract(contracts.Osm, oethOsmAddress)
     this.ethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, ethBundlerAddress)
     this.wstethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, wstethBundlerAddress)
     this.rethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, rethBundlerAddress)
     this.cbethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, cbethBundlerAddress)
+    this.oethBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, oethBundlerAddress)
     this.raiBundler = this.transactor.getGebContract(contracts.BasefeeOsmDeviationCallBundler, raiBundlerAddress)
 
     this.oracleRelayer = this.transactor.getGebContract(
@@ -106,6 +111,13 @@ export class CollateralFsmPinger {
         'function call() external',
       ]).populateTransaction.call()
       this.tryUpdateBundler(tx, 'cbeth')
+    }
+    if (await this.shouldCallOSMBundler('oeth')) {
+      console.log("Updating oeth")
+      tx = await new ethers.Contract(this.oethBundler.address, [
+        'function call() external',
+      ]).populateTransaction.call()
+      this.tryUpdateBundler(tx, 'oeth')
     }
     if (await this.shouldCallOSMBundler('rai')) {
       console.log("Updating rai")
@@ -239,6 +251,9 @@ export class CollateralFsmPinger {
     } else if (collateral == 'cbeth') {
         fsm = this.fsmCBEth
         bundler = this.cbethBundler
+    } else if (collateral == 'oeth') {
+        fsm = this.fsmOEth
+        bundler = this.oethBundler
     } else if (collateral == 'rai') {
         fsm = this.fsmRai
         bundler = this.raiBundler
