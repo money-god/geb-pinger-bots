@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { adminContracts } from '@reflexer-finance/geb-admin'
+import { adminContracts } from '@money-god/geb-admin'
 import { Transactor } from '../chains/transactor'
 import { notifier } from '..'
 import { fetchPendingProposals } from '../utils/subgraph'

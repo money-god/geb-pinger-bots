@@ -2,26 +2,28 @@ import { PingerAccount } from './chains/accounts'
 import { BalanceChecker } from './checkers/balance'
 import { LivenessChecker } from './checkers/liveness'
 import { Notifier } from './notifications/notifier'
-import { CeilingSetter } from './pingers/ceiling-setter'
-import { CollateralAuctionThrottler } from './pingers/collateral-auction-throttler'
+//import { CeilingSetter } from './pingers/ceiling-setter'
+//import { CollateralAuctionThrottler } from './pingers/collateral-auction-throttler'
 import { DebtSettler } from './pingers/debt-pinger'
 import { CollateralFsmPinger } from './pingers/fsm'
-import { CoinTwapAndRateSetter } from './pingers/coin-twap-and-rate-setter'
-import { PauseExecutor } from './pingers/pause-executor'
+import { CoinTwapAndRateSetter } from './pingers/coin-twap-and-rate-setter-new'
+//import { PauseExecutor } from './pingers/pause-executor'
 import { StabilityFeeTreasuryPinger } from './pingers/stability-fee-treasury'
 import { TaxCollectorPinger } from './pingers/tax-collector'
 import { getAddress, getProvider, getWallet } from './utils/wallet'
 import { PingerConifg } from './utils/types'
-import kovanConfig from './../config/config.kovan.json'
+import goerliConfig from './../config/config.goerli.json'
 import mainnetConfig from './../config/config.mainnet.json'
-import { DebtFloorAdjuster } from './pingers/debt-floor-adjuster'
-import { AutoSurplusAuctionedSetter } from './pingers/auto-surplus-auctioned-setter'
-import { AutoSurplusBufferSetter } from './pingers/auto-surplus-buffer-setter'
-import { DebtAuctionInitialParameterSetter } from './pingers/debt-auction-initial-param-setter'
-import { StakedTokensToKeepSetter } from './pingers/staked-token-to-keep-setter'
-import { StakeRewardRefill } from './pingers/stake-reward-refill'
-import { RewardAdjusterBundlerPinger } from './pingers/reward-adjuster-bundler'
-import { RedemptionPriceSnapOracle } from './pingers/redemption-price-snap-oracle'
+
+//import { DebtFloorAdjuster } from './pingers/debt-floor-adjuster'
+//import { AutoSurplusAuctionedSetter } from './pingers/auto-surplus-auctioned-setter'
+//import { AutoSurplusBufferSetter } from './pingers/auto-surplus-buffer-setter'
+//import { DebtAuctionInitialParameterSetter } from './pingers/debt-auction-initial-param-setter'
+//import { StakedTokensToKeepSetter } from './pingers/staked-token-to-keep-setter'
+//import { StakeRewardRefill } from './pingers/stake-reward-refill'
+//import { RewardAdjusterBundlerPinger } from './pingers/reward-adjuster-bundler'
+//
+//import { RedemptionPriceSnapOracle } from './pingers/redemption-price-snap-oracle'
 
 type EnvVar =
   | 'ETH_RPC'
@@ -32,7 +34,7 @@ type EnvVar =
 
 const env = process.env as { [key in EnvVar]: string }
 
-const config = (env.NETWORK === 'mainnet' ? mainnetConfig : kovanConfig) as PingerConifg
+const config = (env.NETWORK === 'mainnet' ? mainnetConfig : goerliConfig) as PingerConifg
 
 export const notifier = new Notifier(env.SLACK_HOOK_ERROR_URL, env.SLACK_HOOK_MULTISIG_URL)
 
@@ -45,18 +47,16 @@ export const updateCoinTwapAndRateSetter = async () => {
     env.NETWORK
   )
   const pinger = new CoinTwapAndRateSetter(
-    config.pingers.coinTwapAndRateSetter.coinTwapAddress,
-    config.pingers.coinTwapAndRateSetter.rateSetterAddress,
+    config.pingers.coinTwapAndRateSetter.ethTwapAddress,
+    config.pingers.coinTwapAndRateSetter.twapRateBundlerAddress,
     wallet,
     config.pingers.coinTwapAndRateSetter.minUpdateIntervalTwap * 60,
-    config.pingers.coinTwapAndRateSetter.minUpdateIntervalRateSetter * 60,
-    config.pingers.coinTwapAndRateSetter.rewardReceiver
   )
   await pinger.ping()
 }
 
 // ETH OSM
-export const updateETHFsm = async () => {
+export const updateFsms = async () => {
   const wallet = await getWallet(
     env.ETH_RPC,
     env.ACCOUNTS_PASSPHRASE,
@@ -64,14 +64,25 @@ export const updateETHFsm = async () => {
     env.NETWORK
   )
   const pinger = new CollateralFsmPinger(
-    config.pingers.ethFsm.fsmAddress,
-    config.pingers.ethFsm.oracleRelayerAddress,
-    config.pingers.ethFsm.collateralType,
+    config.pingers.collateralFsms.fsmEthAddress,
+    config.pingers.collateralFsms.fsmWstEthAddress,
+    config.pingers.collateralFsms.fsmREthAddress,
+    config.pingers.collateralFsms.fsmRaiAddress,
+    config.pingers.collateralFsms.fsmCBEthAddress,
+    config.pingers.collateralFsms.fsmOEthAddress,
+    config.pingers.collateralFsms.ethBundlerAddress,
+    config.pingers.collateralFsms.wstethBundlerAddress,
+    config.pingers.collateralFsms.rethBundlerAddress,
+    config.pingers.collateralFsms.cbethBundlerAddress,
+    config.pingers.collateralFsms.oethBundlerAddress,
+    config.pingers.collateralFsms.raiBundlerAddress,
+    config.pingers.collateralFsms.oracleRelayerAddress,
+    config.pingers.collateralFsms.collateralType,
     wallet,
-    config.pingers.ethFsm.minUpdateInterval * 60,
-    config.pingers.ethFsm.maxNoUpdateInterval * 60,
-    config.pingers.ethFsm.minUpdateIntervalDeviation,
-    config.pingers.ethFsm.callBundlerAddress
+    config.pingers.collateralFsms.minUpdateInterval * 60,
+    config.pingers.collateralFsms.maxNoUpdateInterval * 60,
+    config.pingers.collateralFsms.minUpdateIntervalDeviation,
+    config.pingers.collateralFsms.callBundlerAddress
   )
   await pinger.ping()
 }

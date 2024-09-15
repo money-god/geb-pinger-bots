@@ -5,7 +5,8 @@ import { RPC_FAILED_TIMEOUT, RPC_STALL_TIMEOUT } from './constants'
 export const getPrivateKeyFromHdWallet = (passphrase: string, index: number) => {
   const hdWallet = ethers.utils.HDNode.fromMnemonic(passphrase)
   // Default path m/44'/60'/0'/0/0
-  const path = ethers.utils.defaultPath.slice(0, -1) + index.toString()
+  //const path = ethers.utils.defaultPath.slice(0, -1) + index.toString()
+  const path = "m/44'/0'/0'/0/0".slice(0, -1) + index.toString()
   return hdWallet.derivePath(path)
 }
 

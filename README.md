@@ -48,7 +48,7 @@ If you are new to serverless, follow their AWS getting started guide: https://ww
 Run the pinger bots locally for testing and development on Kovan or Mainnet Ethereum:
 
 ```
-npm run local-kovan <PINGER BOT NAME>
+npm run local-goerli <PINGER BOT NAME>
 npm run local-mainnet <PINGER BOT NAME>
 ```
 
@@ -59,14 +59,14 @@ npm run local-mainnet <PINGER BOT NAME>
 The following commands will deploy all the lambda functions from `serverless.yml` on AWS:
 
 ```
-npm run deploy-kovan
+npm run deploy-goerli
 npm run deploy-mainnet
 ```
 
 To remove the deployment and cleanup all AWS resources, do:
 
 ```
-serverless remove --stage kovan
+serverless remove --stage goerli
 serverless remove --stage mainnet
 ```
 ## RAI subsidy
@@ -85,9 +85,9 @@ To withdraw the RAI as ERC20, you need to do these following 2 steps using your 
 Bot environment variables can be configured from the serverless dashboard:
 
 - Mainnet: https://app.serverless.com/<ORG_NAME>/apps/geb-pinger-bots/geb-pinger-bots/settings/stages/mainnet
-- Kovan: https://app.serverless.com/<ORG_NAME>/apps/geb-pinger-bots/geb-pinger-bots/settings/stages/kovan
+- Goerli: https://app.serverless.com/<ORG_NAME>/apps/geb-pinger-bots/geb-pinger-bots/settings/stages/goerli
 
-After changing a variable, the bots also need to be redeployed. To do that, open the serverless dashboard and go to App -> Kovan/Mainnet -> Deploys and click on "Redeploy".
+After changing a variable, the bots also need to be redeployed. To do that, open the serverless dashboard and go to App -> Goerli/Mainnet -> Deploys and click on "Redeploy".
 
 All environment variables are exclusively read from the `src/index.ts` file.
 
@@ -106,7 +106,7 @@ https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/generate-a-sta
 - `AWS_VPC_SUBNET_ID_2` First VPC id manually created on the AWS console
 - `AWS_SECURITY_GROUP` Dedicated security group
 
-Important configuration including contract addresses, execution interval and more is located in `config/config.mainnet.json` or `config/config.kovan.json`. These file currently contain the configuration the main RAI deployment. Below is a commented version of the json configuration file:
+Important configuration including contract addresses, execution interval and more is located in `config/config.mainnet.json` or `config/config.goerli.json`. These file currently contain the configuration the main RAI deployment. Below is a commented version of the json configuration file:
 
 ```jsonc
 {

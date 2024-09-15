@@ -5,7 +5,7 @@ export const ZERO_BN = BigNumber.from(0)
 export const SECONDS_PER_DAY = 3600 * 24
 
 // In seconds
-export const APPROXIMATED_BLOCK_INTERVAL = 13
+export const APPROXIMATED_BLOCK_INTERVAL = 12
 // If a RPC did not reply within this timeout, start querying other nodes
 export const RPC_STALL_TIMEOUT = 3000
 // Timeout after which the RPC query is considered failed
@@ -21,10 +21,11 @@ export const PENDING_TRANSACTION_GAS_BUMP_PERCENT = 30
 
 // Gas constants for each contract call
 // Naming pattern: <Contract name>__<function name>_GAS
-export const TAX_COLLECTOR__TAX_SINGLE_GAS = BigNumber.from('200000')
+export const TAX_COLLECTOR__TAX_SINGLE_GAS = BigNumber.from('60000')
 export const STABILITY_FEE_TREASURY__TRANSFER_SURPLUS_FUNDS_GAS = BigNumber.from('400000')
 export const RATE_SETTER__UPDATE_RATE_GAS = BigNumber.from('500000')
 export const COIN_TWAP__UPDATE_RESULTS_GAS = BigNumber.from('550000')
+export const TWAP_RATE__UPDATE_RESULTS_GAS = BigNumber.from('600000')
 export const COLLATERAL_FSM__UPDATE_RESULTS_GAS = BigNumber.from('300000')
 export const ORACLE_RELAYER__UPDATE_COLLATERAL_PRICE_GAS = BigNumber.from('200000')
 export const ACCOUNTING_ENGINE__POP_DEBT_FROM_QUEUE_GAS = BigNumber.from('200000')

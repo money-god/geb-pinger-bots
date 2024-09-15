@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { contracts, TransactionRequest } from 'geb.js'
+import { contracts, TransactionRequest } from 'mcgeb.js'
 import { notifier } from '..'
 import { Transactor } from '../chains/transactor'
 import { STABILITY_FEE_TREASURY__TRANSFER_SURPLUS_FUNDS_GAS } from '../utils/constants'
